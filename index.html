@@ -1,0 +1,390 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>CancerAI Diagnostics</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&family=Syne:wght@400;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+
+<aside class="sidebar">
+  <div class="sidebar-top">
+    <div class="brand">
+      <div class="brand-icon">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3m0 14v3M2 12h3m14 0h3m-3.3-7.7-2.1 2.1M7.4 16.6l-2.1 2.1m13.7 0-2.1-2.1M7.4 7.4 5.3 5.3"/></svg>
+      </div>
+      <div>
+        <div class="brand-name">CancerAI</div>
+        <div class="brand-sub">Diagnostics v3</div>
+      </div>
+    </div>
+
+    <nav class="nav">
+      <a class="nav-item active" data-view="analysis" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 17h7m-3.5-3.5v7"/></svg>
+        Analysis
+      </a>
+      <a class="nav-item" data-view="history" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        History
+      </a>
+      <a class="nav-item" data-view="models" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        Models
+      </a>
+      <a class="nav-item" data-view="api" href="#">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg>
+        API Docs
+      </a>
+    </nav>
+  </div>
+
+  <div class="sidebar-bottom">
+    <div class="status-indicator">
+      <div class="status-dot"></div>
+      <div>
+        <div class="status-text">System online</div>
+        <div class="status-sub">AI models loaded · CUDA active</div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<main class="main">
+
+  <!-- ANALYSIS VIEW -->
+  <div id="view-analysis" class="view active">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">New Analysis</h1>
+        <p class="view-sub">Upload histopathology image and/or miRNA expression data for AI-powered diagnosis</p>
+      </div>
+      <div class="header-actions">
+        <div class="mode-tabs">
+          <button class="mode-tab active" data-mode="image">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Image
+          </button>
+          <button class="mode-tab" data-mode="mirna">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            miRNA
+          </button>
+          <button class="mode-tab" data-mode="combined">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+            Combined
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div class="upload-grid">
+      <!-- Image Upload Card -->
+      <div class="upload-card" id="img-upload-card">
+        <div class="upload-zone" id="img-zone" onclick="triggerUpload('image')" ondragover="onDrag(event)" ondrop="onDrop(event,'image')">
+          <input type="file" id="img-file-input" accept="image/*" style="display:none" onchange="handleFile(event,'image')">
+          <div class="upload-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+          </div>
+          <div class="upload-text">Drop histopathology image here</div>
+          <div class="upload-sub-text">or click to browse · JPG, PNG, TIFF</div>
+          <div class="upload-preview" id="img-preview" style="display:none">
+            <img id="img-preview-src" alt="Preview">
+            <div class="preview-filename" id="img-filename"></div>
+          </div>
+        </div>
+        <div class="upload-card-footer">
+          <div class="upload-card-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="18" height="18" rx="2"/><circle cx="8.5" cy="8.5" r="1.5"/><polyline points="21 15 16 10 5 21"/></svg>
+            Histopathology Image
+          </div>
+          <div class="upload-card-model">EfficientNet-B3</div>
+        </div>
+      </div>
+
+      <!-- CSV Upload Card -->
+      <div class="upload-card" id="csv-upload-card">
+        <div class="upload-zone" id="csv-zone" onclick="triggerUpload('csv')" ondragover="onDrag(event)" ondrop="onDrop(event,'csv')">
+          <input type="file" id="csv-file-input" accept=".csv,.xlsx,.xls" style="display:none" onchange="handleFile(event,'csv')">
+          <div class="upload-icon-wrap">
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+          </div>
+          <div class="upload-text">Drop miRNA CSV here</div>
+          <div class="upload-sub-text">or click to browse · CSV, Excel</div>
+          <div class="csv-uploaded-info" id="csv-uploaded-info" style="display:none">
+            <div class="csv-icon">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+            </div>
+            <div class="csv-filename" id="csv-filename"></div>
+          </div>
+        </div>
+        <div class="upload-card-footer">
+          <div class="upload-card-label">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7z"/><circle cx="12" cy="12" r="3"/></svg>
+            miRNA Expression Data
+          </div>
+          <div class="upload-card-model">5-Fold Ensemble</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="run-row">
+      <button class="run-btn" id="run-btn" onclick="runAnalysis()">
+        <span id="run-btn-inner">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="5 3 19 12 5 21 5 3"/></svg>
+          Run Analysis
+        </span>
+        <span id="run-spinner" style="display:none">
+          <span class="spin-ring"></span>
+          Analysing…
+        </span>
+      </button>
+      <div class="run-hint" id="run-hint">Upload at least one file to begin</div>
+    </div>
+
+    <div id="results-section" style="display:none">
+      <div class="section-divider"><span>Analysis Result</span></div>
+
+      <div class="verdict-banner" id="verdict-banner">
+        <div class="verdict-icon" id="verdict-icon"></div>
+        <div class="verdict-body">
+          <div class="verdict-stage">Stage 1 — Cancer Detection</div>
+          <div class="verdict-title" id="verdict-title"></div>
+        </div>
+        <div class="verdict-conf">
+          <div class="verdict-conf-num" id="verdict-conf-num"></div>
+          <div class="verdict-conf-lbl">confidence</div>
+        </div>
+      </div>
+
+      <div class="results-grid">
+        <div class="result-card">
+          <div class="result-card-head">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            Stage 2 — Classification
+          </div>
+          <div class="classif-body">
+            <div class="classif-row"><span class="classif-lbl">Type</span><span class="classif-val" id="r-type"></span></div>
+            <div class="classif-row"><span class="classif-lbl">Organ</span><span class="classif-val" id="r-organ"></span></div>
+            <div class="classif-row"><span class="classif-lbl">Class ID</span><code class="classif-code" id="r-class"></code></div>
+            <div class="classif-row"><span class="classif-lbl">Model</span><span class="classif-val" id="r-model"></span></div>
+            <div class="tier-badge" id="tier-badge"></div>
+          </div>
+        </div>
+
+        <div class="result-card">
+          <div class="result-card-head">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+            Class Probabilities
+          </div>
+          <div id="prob-bars"></div>
+        </div>
+      </div>
+
+      <!-- 🔴 THIS IS THE NEW DIV - ADDED RIGHT HERE 🔴 -->
+      <div id="dual-results-container"></div>
+
+      <!-- Download PDF button -->
+      <div class="download-row" id="download-row" style="display:none">
+        <button class="download-btn" id="download-btn" onclick="downloadReport()">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="7 10 12 15 17 10"/>
+            <line x1="12" y1="15" x2="12" y2="3"/>
+          </svg>
+          Download PDF Report
+        </button>
+        <span class="download-hint">Includes diagnosis, confidence scores &amp; class probabilities</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- HISTORY VIEW -->
+  <div id="view-history" class="view">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">History</h1>
+        <p class="view-sub">All analyses from this session</p>
+      </div>
+      <button class="ghost-btn" onclick="clearHistory()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6M14 11v6"/><path d="M9 6V4h6v2"/></svg>
+        Clear
+      </button>
+    </div>
+    <div id="history-table-wrap">
+      <div class="empty-history" id="empty-history">
+        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+        <p>No analyses yet. Run your first analysis to see results here.</p>
+      </div>
+      <table class="history-table" id="history-table" style="display:none">
+        <thead>
+          <tr><th>Time</th><th>Predicted class</th><th>Status</th><th>Organ</th><th>Confidence</th><th>Mode</th></tr>
+        </thead>
+        <tbody id="history-tbody"></tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- MODELS VIEW -->
+  <div id="view-models" class="view">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">Model Details</h1>
+        <p class="view-sub">Architecture, performance, and training configuration</p>
+      </div>
+    </div>
+    <div class="models-grid">
+      <div class="model-card">
+        <div class="model-card-tag image">Image</div>
+        <div class="model-card-name">EfficientNet-B3</div>
+        <div class="model-card-sub">Histopathology image classifier</div>
+        <div class="model-stats">
+          <div class="model-stat"><div class="model-stat-val">99.92%</div><div class="model-stat-lbl">Test accuracy</div></div>
+          <div class="model-stat"><div class="model-stat-val">5</div><div class="model-stat-lbl">Classes</div></div>
+          <div class="model-stat"><div class="model-stat-val">9.4M</div><div class="model-stat-lbl">Parameters</div></div>
+        </div>
+        <div class="model-tags">
+          <span class="tag">fp16 mixed precision</span>
+          <span class="tag">8× TTA inference</span>
+          <span class="tag">ImageNet pretrained</span>
+          <span class="tag">Cosine LR schedule</span>
+        </div>
+        <div class="model-classes">
+          <div class="class-row cancer"><span class="dot"></span>colon_aca — Colon Adenocarcinoma</div>
+          <div class="class-row normal"><span class="dot"></span>colon_n — Normal Colon Tissue</div>
+          <div class="class-row cancer"><span class="dot"></span>lung_aca — Lung Adenocarcinoma</div>
+          <div class="class-row normal"><span class="dot"></span>lung_n — Normal Lung Tissue</div>
+          <div class="class-row cancer"><span class="dot"></span>lung_scc — Lung Squamous Cell Carcinoma</div>
+        </div>
+      </div>
+
+      <div class="model-card">
+        <div class="model-card-tag mirna">miRNA</div>
+        <div class="model-card-name">Residual Ensemble</div>
+        <div class="model-card-sub">miRNA expression multi-class classifier</div>
+        <div class="model-stats">
+          <div class="model-stat"><div class="model-stat-val">100%</div><div class="model-stat-lbl">Test accuracy</div></div>
+          <div class="model-stat"><div class="model-stat-val">1.000</div><div class="model-stat-lbl">ROC-AUC</div></div>
+          <div class="model-stat"><div class="model-stat-val">5×</div><div class="model-stat-lbl">Fold ensemble</div></div>
+        </div>
+        <div class="model-tags">
+          <span class="tag">Focal loss γ=2</span>
+          <span class="tag">BorderlineSMOTE</span>
+          <span class="tag">MixUp augmentation</span>
+          <span class="tag">150 MI features</span>
+          <span class="tag">Warmup cosine LR</span>
+        </div>
+        <div class="model-classes">
+          <div class="class-row cancer"><span class="dot"></span>Lung Adenocarcinoma</div>
+          <div class="class-row cancer"><span class="dot"></span>Small Cell Lung Cancer</div>
+          <div class="class-row cancer"><span class="dot"></span>Lung Squamous Cell Carcinoma</div>
+          <div class="class-row cancer"><span class="dot"></span>Large Cell Lung Carcinoma</div>
+          <div class="class-row cancer"><span class="dot"></span>Other Lung Cancer</div>
+          <div class="class-row normal"><span class="dot"></span>Non-Small Cell Lung Cancer</div>
+          <div class="class-row normal"><span class="dot"></span>Lung Adenosquamous Carcinoma</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- API VIEW -->
+  <div id="view-api" class="view">
+    <div class="view-header">
+      <div>
+        <h1 class="view-title">API Reference</h1>
+        <p class="view-sub">FastAPI endpoints · Base URL: <code class="inline-code">http://localhost:8000</code></p>
+      </div>
+    </div>
+    <div class="api-section">
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method post">POST</span>
+          <code class="endpoint-path">/predict-image</code>
+          <span class="endpoint-desc">Histopathology image prediction</span>
+        </div>
+        <div class="endpoint-body">
+          <div class="param-section">Request</div>
+          <div class="param-row"><code class="param-name">image_file</code><span class="param-type">file</span><span class="param-desc">Histopathology image (JPG/PNG/TIFF)</span></div>
+          <div class="param-section">Response</div>
+          <pre class="code-block">{
+  "predicted_class": "lung_aca",
+  "label": "Lung Adenocarcinoma",
+  "status": "CANCER",
+  "organ": "Lung",
+  "confidence": 88.7,
+  "probabilities": { "lung_aca": 0.887, "lung_n": 0.042 }
+}</pre>
+        </div>
+      </div>
+
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method post">POST</span>
+          <code class="endpoint-path">/predict-tabular</code>
+          <span class="endpoint-desc">miRNA expression subtype classification</span>
+        </div>
+        <div class="endpoint-body">
+          <div class="param-section">Request</div>
+          <div class="param-row"><code class="param-name">csv_file</code><span class="param-type">file</span><span class="param-desc">CSV with miRNA expression columns</span></div>
+          <div class="param-section">Response</div>
+          <pre class="code-block">{
+  "binary_prediction": "Non-Small Cell Lung Cancer",
+  "subtype_prediction": "Lung Adenocarcinoma",
+  "confidence": 91.4
+}</pre>
+        </div>
+      </div>
+
+      <div class="endpoint-card">
+        <div class="endpoint-head">
+          <span class="method post">POST</span>
+          <code class="endpoint-path">/predict-combined</code>
+          <span class="endpoint-desc">Combined image + miRNA prediction</span>
+        </div>
+        <div class="endpoint-body">
+          <div class="param-section">Request</div>
+          <div class="param-row"><code class="param-name">image_file</code><span class="param-type">file</span><span class="param-desc">Histopathology image</span></div>
+          <div class="param-row"><code class="param-name">csv_file</code><span class="param-type">file</span><span class="param-desc">miRNA expression CSV</span></div>
+          <div class="param-section">Response</div>
+          <pre class="code-block">{
+  "image_prediction": "lung_aca",
+  "molecular_subtype": "Lung Adenocarcinoma",
+  "confidence": 94.2
+}</pre>
+        </div>
+      </div>
+    </div>
+    <div class="disclaimer">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+      Research use only. This tool does not provide medical diagnosis. Always consult a qualified pathologist.
+    </div>
+  </div>
+
+</main>
+
+<script src="/static/app.js"></script>
+<script>
+// Floating particles animation
+(function spawnParticles() {
+  const count = 18;
+  for (let i = 0; i < count; i++) {
+    const p = document.createElement('div');
+    p.className = 'particle';
+    const size = Math.random() * 2.5 + 1;
+    p.style.cssText = [
+      `left:${Math.random()*100}vw`,
+      `width:${size}px`,
+      `height:${size}px`,
+      `animation-duration:${Math.random()*14+10}s`,
+      `animation-delay:${Math.random()*12}s`,
+      `opacity:${Math.random()*.5+.1}`,
+    ].join(';');
+    document.body.appendChild(p);
+  }
+})();
+</script>
+</body>
+</html>

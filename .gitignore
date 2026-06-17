@@ -1,0 +1,8 @@
+dataset_extracted/
+*.zip
+__pycache__/
+
+*.pdf
+report.pdf
+
+*.png
