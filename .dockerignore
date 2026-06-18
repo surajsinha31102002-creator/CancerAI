@@ -1,0 +1,13 @@
+__pycache__/
+*.pyc
+
+dataset_extracted/
+*.zip
+
+CancerAI_Report_*.pdf
+report.pdf
+
+training_results.png
+miRNA_results_v3.png
+
+.git
