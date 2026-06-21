@@ -1,7 +1,7 @@
 // ============================================
 // CONFIGURATION
 // ============================================
-const API_BASE = 'http://localhost:8000';
+const API_BASE = '';
 
 const CLASS_META = {
   colon_aca: { label: 'Colon Adenocarcinoma', organ: 'Colon', status: 'CANCER', color: '#e25454' },
